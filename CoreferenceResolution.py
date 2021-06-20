@@ -4,13 +4,14 @@ import pprint
 import json
 import copy
 
-f = open("./Stories/LittleRedRidingHood.txt",'r',encoding="utf8")
+f = open("./Stories/HanselGretel.txt",'r',encoding="utf8")
 tale= f.read()
 tale = tale.replace('\n', ' ')
 tale = tale.replace('\r', ' ')
 
-text = 'Barack was born in Hawaii. His wife Michelle was born in Milan. He says that she is very smart.'
+
 text=tale
+#text = 'Barack was born in Hawaii. His wife Michelle was born in Milan. He says that she is very smart.'
 print(f"Input text: {text}")
 '''
 >>> l = [1, 2, 3, 4, 5]
@@ -20,15 +21,18 @@ print(f"Input text: {text}")
 '''
 def p(text):
     pprint.pprint(text)
+
 def findRepresentative(chain):
     for mention in chain:
         #print((mention))
         if(mention['isRepresentativeMention']):
             return  copy.deepcopy(mention)
+
 def isPossessive(text):
     if(text.lower() in ['his','her']):
         return True
     return False
+
 def replaceMention(tokenized,representatives):
     for representative in representatives:
         #p(representative['mentions'])
@@ -61,8 +65,7 @@ def representativeDependencies(representatives):
         #pprint.pprint(reper)
         for mention in reper['mentions']:
             for dependent in representatives:
-                for dependentMention in dependent['mentions']:
-                    if( mention[0]==dependentMention[0] and mention[1]>=dependentMention[1] and mention[2]<dependentMention[2]):
+                    if( mention[0]==dependent['sentNum'] and mention[1]>=dependent['startIndex'] and mention[2]<dependent['endIndex']):
                         dependent['dependent'].append([reper['chainID'],isPossessive(mention[3]),mention[1],mention[2],index])
 
 def resolveRepresentativeDependencies(representatives):
@@ -79,19 +82,29 @@ def resolveRepresentativeDependency(representative,representatives):
     if(representative['dependent']==[]):
         return
     
-    lastIndex=representative['dependent'][-1][3]
+    lastIndex=-representative['dependent'][-1][3]+representative['endIndex']
+    representedText=representatives[representative['dependent'][0][-1]]['text']
+    p(representedText)
     newText=''
     tokens=tokenize_text(representative['text'])
     tokens=tokens[0]
-    #pprint.pprint(representative)
-    #p(tokens)
+    pprint.pprint(representative)
+    p(tokens)
     for i in range(lastIndex):
         j=i+1
-        if(j<representative['dependent'][0][2]):
-            print(len(tokens))
-            print(i)
+        if(len(representative['dependent'])==0):
+            break
+        representedStart=representative['dependent'][0][2]-representative['startIndex']
+        representedEnd=-representative['dependent'][0][3]+representative['endIndex']
+        p('START')
+        print(representedStart)
+        print(representedEnd)
+        p('END')
+        if(j<representedStart):
+            #print(len(tokens))
+            #print(i)
             newText=newText+' '+tokens[i]
-        if(j==representative['dependent'][0][3]):
+        if(j==representedEnd):
             resolveRepresentativeDependency(representatives[representative['dependent'][0][4]],representatives)
             newText=newText+representatives[representative['dependent'][0][4]]['text']
             if(representative['dependent'][0][1]):
@@ -99,21 +112,19 @@ def resolveRepresentativeDependency(representative,representatives):
             representative['dependent'].pop(0)
         print(j,newText)
     #p(range(lastIndex,len(tokens)))     
-    for i in range(lastIndex-1,len(tokens)):
+    for i in range(lastIndex,len(tokens)):
         #print(i)
         newText=newText+' '+tokens[i]
     representative['text']=newText
     print(newText)
 
-
-
-    
 def allResolved(representatives):
     for representative in representatives:
         #print(representative)
         if(representative['dependent']!=[]):
             return False
     return True
+
 def tokenize_text(text):
     token_sen = nltk.sent_tokenize(text)
     word = []
@@ -158,14 +169,14 @@ for key in chains:
     representatives.append(represent)
 #pprint.pprint(representatives)
 representativeDependencies(representatives)
-pprint.pprint(representatives)
+#pprint.pprint(representatives)
 resolveRepresentativeDependencies(representatives)
 
-#pprint.pprint(representatives)
+pprint.pprint(representatives)
 
     # reper=representatives[i]['text']
     # print(reper)
-replaceMention(tokenized,representatives)
+#replaceMention(tokenized,representatives)
     #replaced.append(True)
 #print(tokenized)
 #print(representatives)

@@ -15,6 +15,7 @@ from flair.data import Sentence
 
 
 
+
 def movingAverage(array,start,end):
     average=0
     for i in range(start,end+1):

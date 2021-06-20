@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\..\\..\\..\\IdeaProjects\\NLP\\stanford-corenlp-4.2.1"
+		},
+		{
+			"path": "..\\Dependency Parsing\\stanford-parser-4.2.0"
+		}
+	],
+	"settings": {}
+}

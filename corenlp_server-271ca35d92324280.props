@@ -1,0 +1,8 @@
+annotators = coref
+
+outputFormat = serialized
+
+serializer = edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer
+
+coref.algorithm = statistical
+
