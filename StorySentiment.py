@@ -34,7 +34,10 @@ for taleName in tales:
     tale= f.read()
     tale = tale.replace('\n', ' ')
     tale = tale.replace('\r', ' ')
-    tale = tale.replace('\'', ' ')
+    tale = tale.replace('‘', '\"')
+    tale = tale.replace('’', '\"')
+    tale = tale.replace('“', '\"')
+    tale = tale.replace('”', '\"')
 
     taleSentences = nltk.tokenize.sent_tokenize(tale)
     #pprint(tale)

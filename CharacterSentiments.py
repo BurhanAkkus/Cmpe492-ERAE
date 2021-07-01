@@ -5,7 +5,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 import os
 import sys
 tales=[]
-with os.scandir('Corefs/') as entries:
+with os.scandir('Stories/') as entries:
     for entry in entries:
         print(entry.name)
         tales.append(entry.name)
@@ -69,19 +69,27 @@ def GetCharacterSentiment(character,sentences):
     if(len(sentiments)==0):
         return 0
     return sum/(len(sentiments))
-
+punctuations=['.',',','\'','!','?',':',';']
 #tales=['FundeVogel','Rapunzel','TheGooseGirl','Golden Bird','HansInGoodLuck','JorindaAndJorindel','TravelingMusicians','OldSultan','TheStraw','BriarRose','DogAndSparrow','TwelveDancingPrincesses','FishermanAndWife','TheWillowRen','FrogPrince','CatAndMouse']
 taleSentiments=[]
 for taleName in tales:
     #f = open("./Corefs/"+taleName,'r',encoding="utf8")
     p(taleName)
     if (sys.argv[1]==1):
-        f=open("./Stories/"+taleName,'r',encoding="utf8")
+       f=open("./ManualCoreference/"+taleName,'r',encoding="utf8",errors='ignore')
     else:
-        f=open("./Corefs/"+taleName,'r',encoding="utf8")
+        f=open("./Stories/"+taleName,'r',encoding="utf8",errors='ignore')
     tale= f.read()
     tale = tale.replace('\n', ' ')
     tale = tale.replace('\r', ' ')
+    tale = tale.replace('‘', '\"')
+    tale = tale.replace('’', '\"')
+    tale = tale.replace('“', '\"')
+    tale = tale.replace('”', '\"')
+    tale = tale.replace('!', '!')
+    tale = tale.replace('“', '\"')
+    for punctuation in punctuations:
+        tale = tale.replace(punctuation,punctuation+ ' ')
     #pprint.pprint(tale)
     nlp_wrapper = StanfordCoreNLP('http://localhost:9000')
     #doc = "Ronaldo has moved from Real Madrid to Juventus. While Messi still plays for Barcelona"
@@ -105,7 +113,15 @@ for taleName in tales:
 
     result = [item for items, c in Counter(nsubjs).most_common()
                                         for item in [items] * c]
-    characters=CountFrequency(result,len(annot_doc['sentences'])/10,taleName)
+    animates=open("./Animates/"+taleName,'r',encoding="utf8")
+    animate=animates.read().lower()
+    p(animate)
+    
+    characters=[char.lower() for char in result if char.lower() in animate]
+    # p(characters)
+    # p(result)
+    
+    characters=CountFrequency(characters,len(annot_doc['sentences']),taleName)
     #pprint.pprint(result)
     characterSentiments=[]
     for character in characters:
@@ -120,8 +136,13 @@ for taleName in tales:
             #p(character)
         characterSentiments.append([character,GetCharacterSentiment(character,relevantSentences)])
     p(characterSentiments)
-    f=open("./Sentiments/"+taleName,'w',encoding="utf8")
+    f=open("./Characters/Sentiments/"+taleName,'w',encoding="utf8")
     for item in characterSentiments:
         #print ("% s : % d"%(key, value))
-        f.write((item[0]+" : "+ str(item[1]))+"\n")
+            f.write((item[0]+" : "+ str(item[1]))+"\n")
+    f.close()
+    f=open("./Characters/"+taleName,'w',encoding="utf8")
+    for item in characterSentiments:
+        #print ("% s : % d"%(key, value))
+            f.write(item[0]+"\n")
     f.close()

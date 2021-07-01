@@ -40,6 +40,10 @@ for taleName in tales:
     tale= f.read()
     tale = tale.replace('\n', ' ')
     tale = tale.replace('\r', ' ')
+    tale = tale.replace('‘', '\"')
+    tale = tale.replace('’', '\"')
+    tale = tale.replace('“', '\"')
+    tale = tale.replace('”', '\"')
     for punctuation in punctuations:
         tale = tale.replace(punctuation,punctuation+ ' ')
     #text = 'Barack was born in Hawaii. His wife Michelle was born in Milan. He says that she is very smart.'
@@ -75,6 +79,7 @@ for taleName in tales:
     #p(ann['sentences'][0])
     sentenceDeps=[[] for item in ann['sentences']]
     #p(chains)
+    animates=[]
     for chain in chains:
         mychain = list()
         # Loop through every mention of this chain
@@ -82,6 +87,7 @@ for taleName in tales:
         representativeText=findRepresentative(chains[chain])
         #p(chains[chain])
         if(chains[chain][0]['animacy']=='ANIMATE'):
+            animates.append(representativeText)
             #p(chains[chain])
             for mention in chains[chain]:
                 # Get the sentence in which this mention is located, and get the words which are part of this mention
@@ -112,4 +118,8 @@ for taleName in tales:
             f.write(str(token))
             f.write(" ")
     f.close()
-1
+    f = open("./Animates/"+taleName,'w',encoding="utf8")
+    for animate in animates:
+            f.write(str(animate))
+            f.write("\n")
+    f.close()
